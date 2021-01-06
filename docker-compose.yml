@@ -42,4 +42,4 @@ mediadrop-mariadb:
         - MYSQL_USER=mediadrop
         - MYSQL_PASSWORD=ZXCVfdsa1
     volumes:
-        - /opt/docker/mediadrop/mysql:/var/lib/mysql
+        - /opt/docker/mediadrop/mariadb:/var/lib/mysql
