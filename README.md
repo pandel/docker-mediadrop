@@ -1,17 +1,19 @@
 # Docker-Mediadrop
-####Mediadrop on Docker with separate Nginx, uWSGI, and MariaDB containers
+#### Mediadrop on Docker with separate Nginx, uWSGI, and MariaDB containers
+
+#### This fork is based on the work of https://github.com/nmarus/docker-mediadrop
 
 ### Requirements:
 
-- docker 1.8.x
-- docker-compose
+- docker 19*
+- docker-compose 1.26*
 
 ### Container Descriptions:
 This application makes use of docker containerization. This is accomplished across 4 containers.
 
 Their descriptions are outlined as follows:
 
-1. *mediadrop-uwsgi* - Based in debian:jessie. On first start it checks if mediadrop has been and installed. If not, it will:
+1. *mediadrop-uwsgi* - Based in debian:buster. On first start it checks if mediadrop has been and installed. If not, it will:
     * Clone the mediadrop repo from github this build was based on
     * Activates python virtual enviroment
     * Installs mediadrop from source
@@ -19,16 +21,12 @@ Their descriptions are outlined as follows:
     * Configures UWSGI service in socket mode
     * Checks if database is not populated and runs the database scripts and optional databse search tables to the connected mediadtop-mariadb container
 
-
 *Note: See [start.sh] (https://github.com/pandel/docker-mediadrop/blob/master/uwsgi/start.sh)*
 
 
-2. *mediadrop-nginx* - Based on official docker nginx image with customized.
-nginx configuration, and self signed certs.
-
+2. *mediadrop-nginx* - Based on official docker nginx image with customized nginx configuration, and self signed certs.
 
 *Note: This fork contains a non-flash based file uploader, so everything should be fine regarding self-signed SSL certificates.*
-
 
 3. *mediadrop-mariadb* - Based on official docker mariadb image. Uses environment variables defined in the docker-compose.yml to setup the mediadrop database.
 
@@ -38,8 +36,9 @@ nginx configuration, and self signed certs.
 
         $ git clone https://github.com/pandel/docker-mediadrop.git
 
-2. Modify docker-compose.yml - Edit environment variables to include specifics for
-deployment. It will however, work as-is.
+2. Copy env-example to .env, edit .env to set your own parameters
+
+        $ cp env-example .env
 
 3. Build the images - This script creates the docker images on the connected docker server.
 
@@ -55,9 +54,9 @@ deployment. It will however, work as-is.
 
 #### Enable SSL:
 
-1. Modify the nginx/nginx.conf file
-    - Remove the commented sections while also commenting out or removing the "listen 80" line in the main server section
-    - Replace "<fqdn>" with the CNAME used to generate your CA signed certificates (i.e. video.example.com)
+1. Set `USE_SSL=true` in `.env`
+
+2. Set `MEDIADROP_FQDN` to servername of your certificate
 
 2. Upload your certificate and public key to the nginx folder replacing the self signed key found there. Make sure you use the same file names and have concatenated the intermediary certificates if required by your CA.
 
@@ -74,36 +73,15 @@ deployment. It will however, work as-is.
 
         $ docker-compose up -d
 
-#### Enable Volume Mapping
+#### Change Volume Mapping
 
-These steps will ensure that you have the non persistent files stored to your docker host. These changes are made from the docker-compose.yml file.
+By default, every data related file is stored under `/opt/docker/mediadrop`. If you want to change this location, simply edit the `CONFIG` parameter in `.env`.
 
-1. Enable the persistent data volumes for "mediadrop-uwsgi":
+#### Reset everathing, INCLUDING YOUR DATA (BEWARE!)
 
-        volumes:
-            - /opt/docker/mediadrop/wsgi:/wsgi
-            - /opt/docker/mediadrop/mediadrop:/mediadrop
-            - /opt/docker/mediadrop/venv:/venv
+Just run the following commands inside the `docker-mediadrop` folder:
 
-2. Enable the persistent data volume for "mediadrop-mariadb":
-
-        volumes:
-            - /opt/docker/mediadrop/mariadb:/var/lib/mysql
-
-#### Enable the Mediadrop Official Repository
-The installer script downloads a snapshot of the knyar/mediadrop repository fork from 06.01.2021. If you wish to download the latest updates, do the following.
-
-###### Note 1: Depending on how much has changed in the repository, these scripts may not work.
-
-###### Note 2: If you have not enabled the storing of non persistent data outside of docker, your current setup will be reset to default.
-
-1. Add an environment variable to the mediadrop-uwsgi section of the docker-compose.yml file.
-
-        environment:
-            - USE_OFFICIAL_GIT=true
-
-2. Remove containers and redeploy images with new docker-compose.yml file.
-
-        $ docker-compose stop
-        $ docker-compose rm -f
-        $ docker-compose up -d
+        $ docker-compose down
+        $ sudo ./build.sh reset
+        
+These commands will remove everything incl. your data, Docker container and Docker images. The only two Docker images that won't be removed are the `debian` and `mariadb` images, as they might be in use on your system already.
