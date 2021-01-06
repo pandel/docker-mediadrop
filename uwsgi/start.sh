@@ -14,9 +14,9 @@ init_mediadrop() {
 
     #if USE_OFFICIAL_GIT is unset
     if [ -z ${USE_OFFICIAL_GIT+x} ]; then
-        #download mediadrop as tested with this implementation (October 17th 2015)
-        echo "cloning mediadrop from https://github.com/nmarus/mediadrop.git..."
-        git clone https://github.com/nmarus/mediadrop.git /mediadrop
+        #download knyar/mediadrop fork from 06.01.2021
+        echo "Cloning mediadrop from https://github.com/pandel/mediadrop.git..."
+        git clone https://github.com/pandel/mediadrop.git /mediadrop
     else
         #download mediadrop latest from git
         echo "cloning mediadrop from https://github.com/mediadrop/mediadrop.git..."
