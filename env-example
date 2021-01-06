@@ -1,0 +1,14 @@
+CONFIG=/opt/docker/mediadrop
+
+USE_SSL=false
+MEDIADROP_FQDN=my.fullhostname.org
+
+SMTP_SERVER=localhost
+SMTP_DOMAIN=localhost
+SMTP_FROM=noreply
+
+MYSQL_SERVER=mariadb
+MYSQL_ROOT_PASSWORD=ZXCVfdsa1
+MYSQL_DATABASE=mediadrop
+MYSQL_USER=mediadrop
+MYSQL_PASSWORD=ZXCVfdsa1
