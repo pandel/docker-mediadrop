@@ -53,10 +53,10 @@ sfpipe() {
 reset_srv() {
     if [ "$(whoami)" == "root" ]; then
         #remove data folders for rebuild
-        rm -rf /srv/wsgi &> /dev/null || true
-        rm -rf /srv/mediadrop &> /dev/null || true
-        rm -rf /srv/venv &> /dev/null || true
-        rm -rf /srv/mariadb &> /dev/null || true
+        rm -rf /opt/docker/mediadrop/wsgi &> /dev/null || true
+        rm -rf /opt/docker/mediadrop/mediadrop &> /dev/null || true
+        rm -rf /opt/docker/mediadrop/venv &> /dev/null || true
+        rm -rf /opt/docker/mediadrop/mariadb &> /dev/null || true
     else
         sflog "This command must be run as root or sudo."
     fi
