@@ -14,15 +14,16 @@ This application makes use of docker containerization. This is accomplished acro
 Their descriptions are outlined as follows:
 
 1. *mediadrop-uwsgi* - Based in debian:buster. On first start it checks if mediadrop has been and installed. If not, it will:
-    * Clone the mediadrop repo from github this build was based on
+    * Clone the mediadrop repo from my Github fork as of January 1st, 2021
     * Activates python virtual enviroment
     * Installs mediadrop from source
-    * Adds customizations fto the deployment.ini
+    * Adds customizations to the deployment.ini
     * Configures UWSGI service in socket mode
-    * Checks if database is not populated and runs the database scripts and optional databse search tables to the connected mediadtop-mariadb container
+    * Checks if database is not populated and runs the database scripts and optional database search tables to the connected mediadrop-mariadb container
 
-*Note: See [start.sh] (https://github.com/pandel/docker-mediadrop/blob/master/uwsgi/start.sh)*
+*Note: See [start.sh](https://github.com/pandel/docker-mediadrop/blob/master/uwsgi/start.sh)*
 
+*Note: I mirrored the original Mediadrop Python dependencies from https://static.mediadrop.video/dependencies/dev/ to https://open-mind.space/mediadrop-repo/ to make them independently available.*
 
 2. *mediadrop-nginx* - Based on official docker nginx image with customized nginx configuration, and self signed certs.
 
@@ -58,9 +59,9 @@ Their descriptions are outlined as follows:
 
 2. Set `MEDIADROP_FQDN` to servername of your certificate
 
-2. Upload your certificate and public key to the nginx folder replacing the self signed key found there. Make sure you use the same file names and have concatenated the intermediary certificates if required by your CA.
+2. Copy your certificate as `server.crt` (root CA and intermediate certs chained) and your key as `server.key` into the `./nginx` subfolder.
 
-3. If you have already tested this with out SSL enabled, make sure you the mediadrop-nginx container from previous build.
+3. Make sure that everything works as expected without SSL, then stop remove and rebuild the nginx container.
 
         $ docker-compose stop
         $ docker-compose rm mediadrop-nginx
