@@ -27,7 +27,7 @@ Their descriptions are outlined as follows:
 nginx configuration, and self signed certs.
 
 
-*Note: By default, the nginx.conf runs non SSL to get around the Adobe Flash player requirements that do not work with self signed certificates for file upload in regard the ["File I/O Error #2038."] (http://stackoverflow.com/questions/1789863/swfupload-on-https-not-working) To enable SSL, and continue to have file uploads work, you must use a trusted CA signed certificate. (This seems to only affect MAC versions of the flashplayer) See SSL section below under Advanced Configuration.)*
+*Note: This fork contains a non-flash based file uploader, so everything should be fine regarding self-signed SSL certificates.*
 
 
 3. *mediadrop-mariadb* - Based on official docker mariadb image. Uses environment variables defined in the docker-compose.yml to setup the mediadrop database.
