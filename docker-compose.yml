@@ -27,9 +27,9 @@ mediadrop-uwsgi:
     links:
         - mediadrop-mariadb
     volumes:
-        - /venv
-        - /wsgi
-        - /mediadrop
+        - /opt/docker/mediadrop/venv:/venv
+        - /opt/docker/mediadrop/wsgi:/wsgi
+        - /opt/docker/mediadrop/mediadrop:/mediadrop
     command: /start.sh
 mediadrop-mariadb:
     image: mariadb
@@ -42,4 +42,4 @@ mediadrop-mariadb:
         - MYSQL_USER=mediadrop
         - MYSQL_PASSWORD=ZXCVfdsa1
     volumes:
-        - /var/lib/mysql
+        - /opt/docker/mediadrop/mysql:/var/lib/mysql
