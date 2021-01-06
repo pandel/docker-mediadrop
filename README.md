@@ -20,7 +20,7 @@ Their descriptions are outlined as follows:
     * Checks if database is not populated and runs the database scripts and optional databse search tables to the connected mediadtop-mariadb container
 
 
-*Note: See [start.sh] (https://github.com/nmarus/docker-mediadrop/blob/master/uwsgi/start.sh)*
+*Note: See [start.sh] (https://github.com/pandel/docker-mediadrop/blob/master/uwsgi/start.sh)*
 
 
 2. *mediadrop-nginx* - Based on official docker nginx image with customized.
