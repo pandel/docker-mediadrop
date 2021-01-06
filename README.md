@@ -36,7 +36,7 @@ nginx configuration, and self signed certs.
 
 1. Clone this repository
 
-        $ git clone https://github.com/nmarus/docker-mediadrop.git
+        $ git clone https://github.com/pandel/docker-mediadrop.git
 
 2. Modify docker-compose.yml - Edit environment variables to include specifics for
 deployment. It will however, work as-is.
@@ -81,17 +81,17 @@ These steps will ensure that you have the non persistent files stored to your do
 1. Enable the persistent data volumes for "mediadrop-uwsgi":
 
         volumes:
-            - /local/path/for/wsgi:/wsgi
-            - /local/path/for/mediadrop:/mediadrop
-            - /local/path/for/venv:/venv
+            - /opt/docker/mediadrop/wsgi:/wsgi
+            - /opt/docker/mediadrop/mediadrop:/mediadrop
+            - /opt/docker/mediadrop/venv:/venv
 
 2. Enable the persistent data volume for "mediadrop-mariadb":
 
         volumes:
-            - /local/path/for/mysql:/var/lib/mysql
+            - /opt/docker/mediadrop/mariadb:/var/lib/mysql
 
 #### Enable the Mediadrop Official Repository
-The installer script downloads a snapshot of the mediadrop repositry as it was on October 17th, 2015. If you wish to download the latest updates, do the following.
+The installer script downloads a snapshot of the knyar/mediadrop repository fork from 06.01.2021. If you wish to download the latest updates, do the following.
 
 ###### Note 1: Depending on how much has changed in the repository, these scripts may not work.
 
