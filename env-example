@@ -3,6 +3,9 @@ CONFIG=/opt/docker/mediadrop
 USE_SSL=false
 MEDIADROP_FQDN=my.fullhostname.org
 
+HTTP_PORT=80
+HTTPS_PORT=443
+
 SMTP_SERVER=localhost
 SMTP_DOMAIN=localhost
 SMTP_FROM=noreply
@@ -12,3 +15,6 @@ MYSQL_ROOT_PASSWORD=ZXCVfdsa1
 MYSQL_DATABASE=mediadrop
 MYSQL_USER=mediadrop
 MYSQL_PASSWORD=ZXCVfdsa1
+
+RESTART_POLICY=unless-stopped
+

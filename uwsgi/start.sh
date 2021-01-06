@@ -5,33 +5,33 @@ set -e
 init_mediadrop() {
 
     #clear directory contents
-    rm -rf /wsgi/*
-    rm -rf /mediadrop/*
-    rm -rf /venv/*
+    find /wsgi -mindepth 1 -depth -exec rm -rf {} ';'
+    find /mediadrop -mindepth 1 -depth -exec rm -rf {} ';'
+    find /venv -mindepth 1 -depth -exec rm -rf {} ';'
 
     #install python virtual environment
     (cd /venv && virtualenv --distribute --no-site-packages mediadrop)
 
-    #if USE_OFFICIAL_GIT is unset
-    if [ -z ${USE_OFFICIAL_GIT+x} ]; then
-        #download knyar/mediadrop fork from 06.01.2021
-        echo "Cloning mediadrop from https://github.com/pandel/mediadrop.git..."
-        git clone https://github.com/pandel/mediadrop.git /mediadrop
-    else
-        #download mediadrop latest from git
-        echo "cloning mediadrop from https://github.com/mediadrop/mediadrop.git..."
-        git clone https://github.com/mediadrop/mediadrop.git /mediadrop
-    fi
+    #download knyar/mediadrop fork from 06.01.2021
+    echo "Cloning mediadrop from https://github.com/pandel/mediadrop.git..."
+    git clone https://github.com/pandel/mediadrop.git /mediadrop
+    cd /mediadrop
+    git checkout svitle
+    cd ..
 
     #activate python virtual environment
     source /venv/mediadrop/bin/activate
 
     #install mediadrop
     cd /mediadrop
+    # fix package versions, newer lead to errors
+    sed -i.bak '/^Paste /s/>.*/== 1.7.5.1/' requirements.txt
+    sed -i.bak '/^PasteScript /s/>.*/== 1.7.5/' requirements.txt
+    sed -i.bak '/^PasteDeploy /s/>.*/== 1.5.0/' requirements.txt
+    sed -i.bak '/^find_links =/s#=.*#= https://open-mind.space/mediadrop-repo/#' setup.cfg
     pip install aniso8601==1.0.0
     python /mediadrop/setup.py develop
 
-    #setup mediadrop
     cd /wsgi
     paster make-config MediaDrop deployment.ini
     sed -i 's,email_to = you@yourdomain.com,email_to = '${SMTP_FROM}'@'${SMTP_DOMAIN}',' deployment.ini
@@ -71,6 +71,7 @@ fi
 #check if database has and tables defined
 TESTDB="select count(*) from information_schema.tables where table_type = 'BASE TABLE' and table_schema = \"${MYSQL_DATABASE}\""
 if [ $(mysql -ss --host=${MYSQL_SERVER} -u root -p${MYSQL_ROOT_PASSWORD} -e "${TESTDB}") == "0" ]; then
+    cd /wsgi
     #activate python virtual environment
     source /venv/mediadrop/bin/activate
 

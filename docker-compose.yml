@@ -1,45 +1,63 @@
-mediadrop-nginx:
-    image: mediadrop-nginx
-    container_name: mediadrop-nginx
-    hostname: nginx
-    restart: always
-    ports:
-        - "80:80"
-        - "443:443"
-    links:
-        - mediadrop-uwsgi
-    volumes_from:
-        - mediadrop-uwsgi
-mediadrop-uwsgi:
-    image: mediadrop-uwsgi
-    container_name: mediadrop-uwsgi
-    hostname: uwsgi
-    restart: always
-    environment:
-        - SMTP_SERVER=localhost
-        - SMTP_DOMAIN=localhost
-        - SMTP_FROM=noreply
-        - MYSQL_SERVER=mariadb
-        - MYSQL_ROOT_PASSWORD=ZXCVfdsa1
-        - MYSQL_DATABASE=mediadrop
-        - MYSQL_USER=mediadrop
-        - MYSQL_PASSWORD=ZXCVfdsa1
-    links:
-        - mediadrop-mariadb
-    volumes:
-        - /opt/docker/mediadrop/venv:/venv
-        - /opt/docker/mediadrop/wsgi:/wsgi
-        - /opt/docker/mediadrop/mediadrop:/mediadrop
-    command: /start.sh
-mediadrop-mariadb:
-    image: mariadb
-    container_name: mediadrop-mariadb
-    hostname: mariadb
-    restart: always
-    environment:
-        - MYSQL_ROOT_PASSWORD=ZXCVfdsa1
-        - MYSQL_DATABASE=mediadrop
-        - MYSQL_USER=mediadrop
-        - MYSQL_PASSWORD=ZXCVfdsa1
-    volumes:
-        - /opt/docker/mediadrop/mariadb:/var/lib/mysql
+version: '3'
+
+services:
+  mediadrop-nginx:
+      image: mediadrop_local/nginx
+      container_name: mediadrop-nginx
+      restart: ${RESTART_POLICY}
+      ports:
+          - "${HTTP_PORT}:80"
+          - "${HTTPS_PORT}:443"
+      links:
+          - mediadrop-uwsgi
+      volumes_from:
+          - mediadrop-uwsgi
+      networks:
+        mediadrop:
+          aliases:
+            - nginx
+
+  mediadrop-uwsgi:
+      image: mediadrop_local/uwsgi
+      container_name: mediadrop-uwsgi
+      restart: ${RESTART_POLICY}
+      environment:
+          - SMTP_SERVER
+          - SMTP_DOMAIN
+          - SMTP_FROM
+          - MYSQL_SERVER
+          - MYSQL_ROOT_PASSWORD
+          - MYSQL_DATABASE
+          - MYSQL_USER
+          - MYSQL_PASSWORD
+      links:
+          - mediadrop-mariadb
+      volumes:
+          - ${CONFIG}/venv:/venv
+          - ${CONFIG}/wsgi:/wsgi
+          - ${CONFIG}/mediadrop:/mediadrop
+      command: /start.sh
+      networks:
+        mediadrop:
+          aliases:
+            - uwsgi
+
+  mediadrop-mariadb:
+      image: mediadrop_local/mariadb
+      container_name: mediadrop-mariadb
+      restart: ${RESTART_POLICY}
+      environment:
+          - MYSQL_ROOT_PASSWORD
+          - MYSQL_DATABASE
+          - MYSQL_USER
+          - MYSQL_PASSWORD
+      volumes:
+          - ${CONFIG}/mariadb:/var/lib/mysql
+      networks:
+        mediadrop:
+          aliases:
+            - mariadb
+
+networks:
+  mediadrop:
+

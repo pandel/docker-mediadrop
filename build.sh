@@ -3,6 +3,8 @@
 
 set -e
 
+source .env
+
 #colors
 NONE=$(echo -e '\033[00m')
 RED=$(echo -e '\033[00;31m')
@@ -13,6 +15,8 @@ CYAN=$(echo -e '\033[00;36m')
 WHITE=$(echo -e '\033[00;37m')
 BOLD=$(echo -e '\033[1m')
 UNDERLINE=$(echo -e '\033[4m')
+
+LOCALREPO=mediadrop_local
 
 #print timestamp
 timestamp() {
@@ -52,11 +56,17 @@ sfpipe() {
 #check for root access and re-init /srv folders
 reset_srv() {
     if [ "$(whoami)" == "root" ]; then
-        #remove data folders for rebuild
-        rm -rf /opt/docker/mediadrop/wsgi &> /dev/null || true
-        rm -rf /opt/docker/mediadrop/mediadrop &> /dev/null || true
-        rm -rf /opt/docker/mediadrop/venv &> /dev/null || true
-        rm -rf /opt/docker/mediadrop/mariadb &> /dev/null || true
+        if [ -d ${CONFIG} ]; then
+            rm -rf ${CONFIG} &> /dev/null || true
+        fi
+        docker rm -f mediadrop-mariadb &> /dev/null || true 
+        docker rm -f mediadrop-uwsgi &> /dev/null || true
+        docker rm -f mediadrop-nginx &> /dev/null || true 
+        docker rmi $LOCALREPO/mariadb &> /dev/null || true 
+        docker rmi $LOCALREPO/uwsgi &> /dev/null || true
+        docker rmi $LOCALREPO/nginx &> /dev/null || true 
+        docker rmi $LOCALREPO/nginx-base &> /dev/null || true
+        docker network rm docker-mediadrop_mediadrop &> /dev/null || true
     else
         sflog "This command must be run as root or sudo."
     fi
@@ -65,9 +75,21 @@ reset_srv() {
 #build nginx
 build_nginx() {
     {
+        rm -f nginx/nginx.conf
+        if [ "$USE_SSL" == "true" ]; then
+            (cd nginx && cp nginx-ssl.tmpl nginx.conf && sed -i "s/MEDIADROP_FQDN/$MEDIADROP_FQDN/" nginx.conf)
+        else
+            (cd nginx && cp nginx-non-ssl.tmpl nginx.conf)
+        fi
+
+		# pre-build docker base image
+        if [ "$(docker image ls -a "$LOCALREPO/nginx-base" | grep -F "$LOCALREPO/nginx-base")" == "" ]; then
+        	(cd nginx-base && docker build --rm --no-cache -t $LOCALREPO/nginx-base . )
+		fi
+
         #remove image
-        (docker rmi mediadrop-nginx &> /dev/null || true )
-        (cd nginx && docker build --rm --no-cache -t mediadrop-nginx . )
+        (docker rmi $LOCALREPO/nginx &> /dev/null || true )
+        (cd nginx && docker build --rm --no-cache -t $LOCALREPO/nginx . )
     } | sfpipe nginix ${RED}
 }
 
@@ -75,8 +97,8 @@ build_nginx() {
 build_uwsgi() {
     {
         #remove image
-        (docker rmi mediadrop-uwsgi &> /dev/null || true )
-        (cd uwsgi && docker build --rm --no-cache -t mediadrop-uwsgi .)
+        (docker rmi $LOCALREPO/uwsgi &> /dev/null || true )
+        (cd uwsgi && docker build --rm --no-cache -t $LOCALREPO/uwsgi .)
     } | sfpipe uwsgi ${GREEN}
 }
 
@@ -85,6 +107,7 @@ build_mariadb() {
     {
         #pull latest base image
         docker pull mariadb
+        docker tag mariadb $LOCALREPO/mariadb
     } | sfpipe mariadb ${YELLOW}
 }
 
@@ -110,3 +133,4 @@ else
     echo "Usage: ${0} all|nginx|uwsgi|reset"
 fi
 docker rmi $(docker images -q -f dangling=true) &> /dev/null
+
