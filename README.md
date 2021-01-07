@@ -21,7 +21,7 @@ Their descriptions are outlined as follows:
     * Configures UWSGI service in socket mode
     * Checks if database is not populated and runs the database scripts and optional database search tables to the connected mediadrop-mariadb container
 
-*Note: See [start.sh](https://github.com/pandel/docker-mediadrop/blob/master/uwsgi/start.sh)*
+*Note: See [start.sh](https://github.com/pandel/docker-mediadrop/blob/patch-1/uwsgi/start.sh)*
 
 *Note: I mirrored the original Mediadrop Python dependencies from https://static.mediadrop.video/dependencies/dev/ to https://open-mind.space/mediadrop-repo/ to make them independently available.*
 
