@@ -35,11 +35,11 @@ Their descriptions are outlined as follows:
 
 1. Clone this repository
 
-        $ git clone https://gitlab.open-mind.space/pandel/docker-mediadrop.git
+        $ git clone -b patch-1 https://gitlab.open-mind.space/pandel/docker-mediadrop.git
 
    or
 
-        $ git clone https://github.com/pandel/docker-mediadrop.git
+        $ git clone -b patch-1 https://github.com/pandel/docker-mediadrop.git
 
 2. Copy env-example to .env, edit .env to set your own parameters
 
